@@ -213,20 +213,6 @@ jobs:
           echo "require-board=${{ matrix.CPU }}" >> ./${OS_DIR}/info.conf
           echo "version=$(date +%Y-%m-%d)" >> ./${OS_DIR}/info.conf
 
-          # build sd image
-          FILENAME_SD=${{ matrix.CPU }}-sd-alpine-linux-arm64-$(date +%Y-%m-%d).img
-          echo "##[set-output name=img_filename_sd;]$FILENAME_SD"
-          ./mk-sd-image.sh ${OS_DIR} ${FILENAME_SD}
-          mv out/${FILENAME_SD} ../../artifact/
-
-          # build sd-to-emmc image
-          FILENAME_SD2EMMC=${{ matrix.CPU }}-eflasher-alpine-linux-arm64-$(date +%Y-%m-%d).img
-          echo "##[set-output name=img_filename_sd2emmc;]$FILENAME_SD2EMMC"
-          wget http://112.124.9.243/dvdfiles/${{ matrix.CPU }}/images-for-eflasher/emmc-flasher-images.tgz
-          tar xzf emmc-flasher-images.tgz
-          RAW_SIZE_MB=8000 ./mk-emmc-image.sh ${OS_DIR} filename=${FILENAME_SD2EMMC} autostart=yes
-          mv out/${FILENAME_SD2EMMC} ../../artifact/
-
           # package image-assets-xyz.tgz
           IMAGE_ASSETS_PKG=image-assets-${{ matrix.CPU }}.tgz
           echo "##[set-output name=image_assets_pkg_filename;]$IMAGE_ASSETS_PKG"
@@ -246,24 +232,6 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./artifact/${{ steps.build_sd_image.outputs.image_assets_pkg_filename }}
         asset_name: ${{ steps.build_sd_image.outputs.image_assets_pkg_filename }}
-        tag: ${{ needs.prepare_release.outputs.release_tag }}
-        overwrite: true
-
-    - name: Upload sd image to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./artifact/${{ steps.build_sd_image.outputs.img_filename_sd }}.gz
-        asset_name: ${{ steps.build_sd_image.outputs.img_filename_sd }}.gz
-        tag: ${{ needs.prepare_release.outputs.release_tag }}
-        overwrite: true
-
-    - name: Upload sd-to-emmc image to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./artifact/${{ steps.build_sd_image.outputs.img_filename_sd2emmc }}.gz
-        asset_name: ${{ steps.build_sd_image.outputs.img_filename_sd2emmc }}.gz
         tag: ${{ needs.prepare_release.outputs.release_tag }}
         overwrite: true
 
