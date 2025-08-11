@@ -221,9 +221,6 @@ jobs:
           mv ${OS_DIR} image-assets-${{ matrix.CPU }}/
           tar czf ${IMAGE_ASSETS_PKG} image-assets-${{ matrix.CPU }}
           mv ${IMAGE_ASSETS_PKG} ../../artifact/
-
-          cd ../../artifact/
-          gzip *.img
         '
 
     - name: Upload rootfs to release
